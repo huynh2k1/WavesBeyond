@@ -1,0 +1,18 @@
+using UnityEngine;
+
+public abstract class BaseUI : MonoBehaviour
+{
+    public abstract UIType Type { get; }
+    public virtual void Show() => gameObject.SetActive(true);
+    public virtual void Hide() => gameObject.SetActive(false);
+}
+
+public enum UIType
+{
+    HOME,
+    GAME,
+    WIN,
+    HELP,
+    SETTING,
+    PAUSE,
+}
