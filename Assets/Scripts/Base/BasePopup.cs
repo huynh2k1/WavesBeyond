@@ -10,7 +10,7 @@ public class BasePopup : BaseUI
 
     [Header("References")]
     [SerializeField] protected Button btnClose;
-    [SerializeField] protected Image mask;
+    [SerializeField] protected Image panel;
     [SerializeField] protected CanvasGroup mainGroup;
     [SerializeField] protected GameObject main;
 
@@ -34,9 +34,9 @@ public class BasePopup : BaseUI
     {
         //Load Mask
         Transform maskTf = transform.GetComponentsInChildren<Transform>(true)
-                            .FirstOrDefault(t => t.name == "Mask");
+                            .FirstOrDefault(t => t.name == "Panel");
         if (maskTf != null)
-            mask = maskTf.GetComponent<Image>();
+            panel = maskTf.GetComponent<Image>();
 
         //Load mainGroup
         mainGroup = transform.GetComponentInChildren<CanvasGroup>(true);
@@ -51,10 +51,10 @@ public class BasePopup : BaseUI
 
     protected virtual void Initialize()
     {
-        if (mask != null)
+        if (panel != null)
         {
-            mask.gameObject.SetActive(false);
-            mask.raycastTarget = true;
+            panel.gameObject.SetActive(false);
+            panel.raycastTarget = true;
         }
 
         if (main != null)
@@ -130,8 +130,8 @@ public class BasePopup : BaseUI
 
     protected virtual void FadeMask(bool isShowing)
     {
-        if (mask == null) return;
-        mask.gameObject.SetActive(isShowing);
+        if (panel == null) return;
+        panel.gameObject.SetActive(isShowing);
         //mask.DOKill();
         //if (isShowing)
         //{

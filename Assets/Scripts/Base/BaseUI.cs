@@ -14,5 +14,7 @@ public enum UIType
     WIN,
     HELP,
     SETTING,
-    PAUSE,
+    HOWTOPLAY,
+    LOSE,
+    SELECTLEVEL,
 }
