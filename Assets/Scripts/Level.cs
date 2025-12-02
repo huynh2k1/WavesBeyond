@@ -5,6 +5,7 @@ public class Level : MonoBehaviour
 {
     [SerializeField] Grid grid;
     private Dictionary<(int, int), Cell> dictGrid = new Dictionary<(int, int), Cell>();
+    private Dictionary<(int, int), DynamicObj> dictDNM = new Dictionary<(int, int), DynamicObj>();
     [SerializeField] PlayerInput playerCtrl;
     public int moveCount;
 
@@ -14,9 +15,12 @@ public class Level : MonoBehaviour
 
         GenerateGrid();
 
+        GenerateDynamicObj();
+
         if (playerCtrl == null)
             playerCtrl = GetComponentInChildren<PlayerInput>(); 
-        playerCtrl.Initialize(grid, dictGrid);
+        playerCtrl.Initialize(grid, dictGrid, dictDNM);
+
     }
 
     void GenerateGrid()
@@ -27,6 +31,17 @@ public class Level : MonoBehaviour
         {
             c.Initialize(grid);
             dictGrid[(c.gridPos.x, c.gridPos.y)] = c;
+        }
+    }
+
+    void GenerateDynamicObj()
+    {
+        DynamicObj[] dynamicObjs = GetComponentsInChildren<DynamicObj>();
+
+        foreach (DynamicObj d in dynamicObjs)
+        {
+            d.Initialize(grid);
+            dictDNM[(d.gridPos.x, d.gridPos.y)] = d;
         }
     }
 

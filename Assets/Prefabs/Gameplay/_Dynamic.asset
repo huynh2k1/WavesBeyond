@@ -42,4 +42,4 @@ MonoBehaviour:
   m_LastPickedCellSize: {x: 1, y: 1, z: 1}
   m_LastPickedCellGap: {x: 0, y: 0, z: 0}
   m_Anchor: {x: 0.5, y: 0.5, z: 0.5}
-  m_Prefab: {fileID: 3202112208111216660, guid: e3094b39c33be62459fb3fe68f144d0d, type: 3}
+  m_Prefab: {fileID: 2111746060688352742, guid: 93f3f14c24c68fc43ba5475b0efa0b66, type: 3}

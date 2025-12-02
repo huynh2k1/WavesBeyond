@@ -6,6 +6,8 @@ public class PlayerInput : MonoBehaviour
 {
     public Vector3Int gridPos;
     private Dictionary<(int, int), Cell> dictGrid;
+    private Dictionary<(int, int), DynamicObj> dictDNM;
+
 
     //None -> được đi
     //Dynamic _> di chuyển ô đó
@@ -28,10 +30,11 @@ public class PlayerInput : MonoBehaviour
         }
     }
 
-    public void Initialize(Grid grid, Dictionary<(int, int), Cell> dict)
+    public void Initialize(Grid grid, Dictionary<(int, int), Cell> dict, Dictionary<(int, int), DynamicObj> dictDynamic)
     {
         gridPos = grid.WorldToCell(transform.position);
         dictGrid = new Dictionary<(int, int), Cell>(dict);
+        dictDNM = new Dictionary<(int, int), DynamicObj>(dictDynamic);
     }
 
 
@@ -41,8 +44,19 @@ public class PlayerInput : MonoBehaviour
         actionDone?.Invoke();
     }
 
-    void TryMove(Dictionary<(int, int), Cell> dictGrid, Vector2Int direction)
+    void TryMove(Vector2Int direction)
     {
+        if (dictGrid == null)
+        {
+            Debug.LogError("PlayerInput.TryMove: dictGrid is null!");
+            return;
+        }
+
+        if (dictDNM == null)
+        {
+            Debug.LogError("PlayerInput.TryMove: dictDNM is null! Did you call Initialize(...) ?");
+            return;
+        }
         (int, int) targetKey = (gridPos.x + direction.x, gridPos.y + direction.y);
 
         if (!dictGrid.TryGetValue(targetKey, out Cell cell) || cell == null)
@@ -54,9 +68,10 @@ public class PlayerInput : MonoBehaviour
             return;
 
 
-        if (cell.TypeCell == Cell.Type.DYNAMIC)
+        if (dictDNM.TryGetValue(targetKey, out DynamicObj dynamicObj) && dynamicObj != null)
         {
-            cell.TryMove(dictGrid,direction);
+            Debug.Log("Dynamic try move");
+            dynamicObj.TryMove(dictGrid, dictDNM, direction);
             return;
         }
 
@@ -90,22 +105,22 @@ public class PlayerInput : MonoBehaviour
 
     public void MoveLeft(Dictionary<(int, int), Cell> dictGrid)
     {
-        TryMove(dictGrid, new Vector2Int(-1, 0));
+        TryMove(new Vector2Int(-1, 0));
     }
 
     public void MoveRight(Dictionary<(int, int), Cell> dictGrid)
     {
-        TryMove(dictGrid, new Vector2Int(+1, 0));
+        TryMove(new Vector2Int(+1, 0));
     }
 
     public void MoveUp(Dictionary<(int, int), Cell> dictGrid)
     {
-        TryMove(dictGrid, new Vector2Int(0, +1));
+        TryMove(new Vector2Int(0, +1));
     }
 
     public void MoveDown(Dictionary<(int, int), Cell> dictGrid)
     {
-        TryMove(dictGrid, new Vector2Int(0, -1));
+        TryMove(new Vector2Int(0, -1));
     }
 
 }

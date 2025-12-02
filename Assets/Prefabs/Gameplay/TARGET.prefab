@@ -138,7 +138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4300381797235817227, guid: 85632267e3ff34042a70c78ca14ac202, type: 3}
       propertyPath: TypeCell
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8327881496310962520, guid: 85632267e3ff34042a70c78ca14ac202, type: 3}
       propertyPath: m_Name
