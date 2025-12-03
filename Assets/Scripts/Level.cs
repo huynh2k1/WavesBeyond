@@ -6,6 +6,7 @@ public class Level : MonoBehaviour
     [SerializeField] Grid grid;
     private Dictionary<(int, int), Cell> dictGrid = new Dictionary<(int, int), Cell>();
     private Dictionary<(int, int), DynamicObj> dictDNM = new Dictionary<(int, int), DynamicObj>();
+    private Dictionary<(int, int), Shark> dictShark = new Dictionary<(int, int), Shark>();
     [SerializeField] PlayerInput playerCtrl;
     public int moveCount;
 
@@ -15,11 +16,14 @@ public class Level : MonoBehaviour
 
         GenerateGrid();
 
+        GenerateSharks();
+
         GenerateDynamicObj();
+
 
         if (playerCtrl == null)
             playerCtrl = GetComponentInChildren<PlayerInput>(); 
-        playerCtrl.Initialize(grid, dictGrid, dictDNM);
+        playerCtrl.Initialize(grid, dictGrid, dictDNM, dictShark);
 
     }
 
@@ -40,11 +44,21 @@ public class Level : MonoBehaviour
 
         foreach (DynamicObj d in dynamicObjs)
         {
-            d.Initialize(grid);
+            d.Initialize(grid, dictShark);
             dictDNM[(d.gridPos.x, d.gridPos.y)] = d;
         }
     }
 
+    void GenerateSharks()
+    {
+        Shark[] sharks = GetComponentsInChildren<Shark>();
+        foreach (Shark s in sharks)
+        {
+            s.Initialize(grid);
+            dictShark[(s.gridPos.x, s.gridPos.y)] = s;
+        }
+
+    }
     public void Destroy()
     {
         Destroy(gameObject);

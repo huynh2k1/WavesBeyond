@@ -7,6 +7,7 @@ public class PlayerInput : MonoBehaviour
     public Vector3Int gridPos;
     private Dictionary<(int, int), Cell> dictGrid;
     private Dictionary<(int, int), DynamicObj> dictDNM;
+    private Dictionary<(int, int), Shark> dictSharks;
 
 
     //None -> được đi
@@ -30,11 +31,16 @@ public class PlayerInput : MonoBehaviour
         }
     }
 
-    public void Initialize(Grid grid, Dictionary<(int, int), Cell> dict, Dictionary<(int, int), DynamicObj> dictDynamic)
+    public void Initialize(Grid grid, 
+        Dictionary<(int, int), Cell> dict, 
+        Dictionary<(int, int), DynamicObj> dictDynamic,
+        Dictionary<(int, int), Shark> dictShark
+       )
     {
         gridPos = grid.WorldToCell(transform.position);
         dictGrid = new Dictionary<(int, int), Cell>(dict);
         dictDNM = new Dictionary<(int, int), DynamicObj>(dictDynamic);
+        dictSharks = new Dictionary<(int, int), Shark>(dictShark);
     }
 
 
@@ -97,10 +103,41 @@ public class PlayerInput : MonoBehaviour
             if(gameControl.I.IsOutOfMove)
             {
                 gameControl.I.Lose();
+                return;
             }
 
+            HandleSharkMove(transform.position, gridPos);
         });
 
+    }
+
+    void HandleSharkMove(Vector3 targetPos, Vector3Int gridPosition)
+    {
+        // 4 hướng quanh player
+        Vector2Int[] dirs = new Vector2Int[]
+        {
+        new Vector2Int(1,0),   // phải
+        new Vector2Int(-1,0),  // trái
+        new Vector2Int(0,1),   // lên
+        new Vector2Int(0,-1),  // xuống
+        };
+
+        foreach (var dir in dirs)
+        {
+            (int, int) key = (gridPos.x + dir.x, gridPos.y + dir.y);
+
+            if (dictSharks.TryGetValue(key, out Shark shark))
+            {
+                dictSharks[(shark.gridPos.x, shark.gridPos.y)] = null;
+                dictSharks[(gridPosition.x, gridPosition.y)] = shark;
+
+                shark.MoveToPos(targetPos, () =>
+                {
+                    Destroy(gameObject);
+                    gameControl.I.Lose();
+                });
+            }
+        }
     }
 
     public void MoveLeft(Dictionary<(int, int), Cell> dictGrid)
