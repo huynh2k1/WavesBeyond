@@ -17,6 +17,8 @@ public class DynamicObj : MonoBehaviour
 
     public void MoveToPos(Vector3 pos, Action actionDone = default)
     {
+        audioCtrl.I.PlaySoundByType(AudioType.MOVE);
+
         transform.DOKill();
         transform.DOMove(pos, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
         {
@@ -93,9 +95,11 @@ public class DynamicObj : MonoBehaviour
 
                 shark.gridPos = gridPosition;
 
+                audioCtrl.I.PlaySoundByType(AudioType.DYNAMIC);
                 shark.MoveToPos(targetPos, () =>
                 {
                     dictDynamic[(gridPos.x, gridPos.y)] = null;
+
 
                     actionDone?.Invoke();
                     Destroy(gameObject);

@@ -75,6 +75,7 @@ public class gameControl : MonoBehaviour
         lvlCtrl.CheckIncreaseLevel();
         DOVirtual.DelayedCall(1f, () =>
         {
+            audioCtrl.I.PlaySoundByType(AudioType.WIN);
             uiCtrl.Show(UIType.WIN);
         });
     }
@@ -84,6 +85,7 @@ public class gameControl : MonoBehaviour
         ChangeState(State.NONE);
         DOVirtual.DelayedCall(1f, () =>
         {
+            audioCtrl.I.PlaySoundByType(AudioType.LOSE);
             uiCtrl.Show(UIType.LOSE);
         });
     }

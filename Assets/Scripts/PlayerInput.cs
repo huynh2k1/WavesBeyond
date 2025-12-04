@@ -14,24 +14,22 @@ public class PlayerInput : MonoBehaviour
     //None -> được đi
     //Dynamic _> di chuyển ô đó
 
-
-    private void Update()
+    private void OnEnable()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            MoveLeft(dictGrid);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            MoveRight(dictGrid);
-        }else if (Input.GetKeyDown(KeyCode.W))
-        {
-            MoveUp(dictGrid);
-        }else if (Input.GetKeyDown(KeyCode.S))
-        {
-            MoveDown(dictGrid);
-        }
+        gameUI.OnClickMoveLeftAction += MoveLeft;
+        gameUI.OnClickMoveRightAction += MoveRight;
+        gameUI.OnClickMoveUpAction += MoveUp;
+        gameUI.OnClickMoveDownAction += MoveDown;
     }
+
+    private void OnDestroy()
+    {
+        gameUI.OnClickMoveLeftAction -= MoveLeft;
+        gameUI.OnClickMoveRightAction -= MoveRight;
+        gameUI.OnClickMoveUpAction -= MoveUp;
+        gameUI.OnClickMoveDownAction -= MoveDown;
+    }
+
 
     public void Initialize(Grid grid, 
         Dictionary<(int, int), Cell> dict, 
@@ -48,6 +46,8 @@ public class PlayerInput : MonoBehaviour
 
     public void MoveToPos(Vector3 pos, Action actionDone)
     {
+        audioCtrl.I.PlaySoundByType(AudioType.MOVE);
+
         transform.DOKill();
         transform.DOMove(pos, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
         {
@@ -149,6 +149,8 @@ public class PlayerInput : MonoBehaviour
                 dictSharks[(gridPosition.x, gridPosition.y)] = shark;
 
                 shark.gridPos = gridPosition;
+                audioCtrl.I.PlaySoundByType(AudioType.SHARK);
+
                 shark.MoveToPos(targetPos, () =>
                 {
                     Destroy(gameObject);
@@ -159,22 +161,22 @@ public class PlayerInput : MonoBehaviour
         }
     }
 
-    public void MoveLeft(Dictionary<(int, int), Cell> dictGrid)
+    public void MoveLeft()
     {
         TryMove(new Vector2Int(-1, 0));
     }
 
-    public void MoveRight(Dictionary<(int, int), Cell> dictGrid)
+    public void MoveRight()
     {
         TryMove(new Vector2Int(+1, 0));
     }
 
-    public void MoveUp(Dictionary<(int, int), Cell> dictGrid)
+    public void MoveUp()
     {
         TryMove(new Vector2Int(0, +1));
     }
 
-    public void MoveDown(Dictionary<(int, int), Cell> dictGrid)
+    public void MoveDown()
     {
         TryMove(new Vector2Int(0, -1));
     }

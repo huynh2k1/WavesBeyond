@@ -12,6 +12,7 @@ public class audioCtrl : MonoBehaviour
 
     public AudioClip music;
     public AudioClip click;
+    public AudioClip move;
     public AudioClip win;
     public AudioClip lose;
     public AudioClip dynamic;
@@ -20,13 +21,35 @@ public class audioCtrl : MonoBehaviour
     private void Awake()
     {
         I = this;
+        queue_sources = new Queue<AudioSource>(sound_sources);
+    }
+    private void Start()
+    {
+        PlayMusic();
     }
 
     public virtual void PlaySoundByType(AudioType type)
     {
         switch (type)
         {
-            
+            case AudioType.CLICK:
+                PlayAudio(click);
+                break;
+            case AudioType.WIN:
+                PlayAudio(win); 
+                break;
+            case AudioType.MOVE:
+                PlayAudio(move);
+                break;
+            case AudioType.LOSE:
+                PlayAudio(lose);
+                break;
+            case AudioType.DYNAMIC:
+                PlayAudio(dynamic);
+                break;
+            case AudioType.SHARK:
+                PlayAudio(shark);
+                break;
         }
     }
 

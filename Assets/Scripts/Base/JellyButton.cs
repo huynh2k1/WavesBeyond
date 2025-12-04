@@ -50,6 +50,8 @@ public class JellyButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (_btn && _btn.interactable)
             _btn.onClick.Invoke();
 
+        audioCtrl.I.PlaySoundByType(AudioType.CLICK);
+
         StartDelay();
     }
 
