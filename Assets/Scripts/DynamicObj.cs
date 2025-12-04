@@ -11,7 +11,7 @@ public class DynamicObj : MonoBehaviour
     public void Initialize(Grid grid, Dictionary<(int, int), Shark> dictShark)
     {
         gridPos = grid.WorldToCell(transform.position);
-        dictSharks = new Dictionary<(int, int), Shark>(dictShark);
+        dictSharks = dictShark;
     }
 
     public void MoveToPos(Vector3 pos, Action actionDone = default)
@@ -20,7 +20,7 @@ public class DynamicObj : MonoBehaviour
         actionDone?.Invoke();
     }
 
-    public void TryMove(Dictionary<(int, int), Cell> dictGrid, 
+    public void TryMove(Dictionary<(int, int), Cell> dictGrid,
         Dictionary<(int, int), DynamicObj> dictDynamic,
         Vector2Int direction)
     {
@@ -32,9 +32,12 @@ public class DynamicObj : MonoBehaviour
             return;
 
         // Ô kế bên có Dynamic hoặc Target → không di chuyển
-        if (cell.TypeCell == Cell.Type.TARGET)
+        if ((cell.TypeCell == Cell.Type.STATIC) || cell.TypeCell == Cell.Type.TARGET)
             return;
-
+        if (dictDynamic.TryGetValue(targetKey, out DynamicObj dynamicObj) && dynamicObj != null)
+        {
+            return;
+        }
         // Update số lượt di chuyển
         gameControl.I.UpdateMove();
 
@@ -64,13 +67,17 @@ public class DynamicObj : MonoBehaviour
 
     void HandleSharkMove(Vector3 targetPos, Vector3Int gridPosition, Action actionDone = default)
     {
-        // 4 hướng quanh player
         Vector2Int[] dirs = new Vector2Int[]
         {
-        new Vector2Int(1,0),   // phải
-        new Vector2Int(-1,0),  // trái
-        new Vector2Int(0,1),   // lên
-        new Vector2Int(0,-1),  // xuống
+            new Vector2Int( 1, 0),   // phải
+            new Vector2Int(-1, 0),   // trái
+            new Vector2Int( 0, 1),   // lên
+            new Vector2Int( 0,-1),   // xuống
+
+            new Vector2Int( 1, 1),   // chéo phải lên
+            new Vector2Int( 1,-1),   // chéo phải xuống
+            new Vector2Int(-1, 1),   // chéo trái lên
+            new Vector2Int(-1,-1),   // chéo trái xuống
         };
 
         foreach (var dir in dirs)
@@ -82,11 +89,12 @@ public class DynamicObj : MonoBehaviour
                 dictSharks[(shark.gridPos.x, shark.gridPos.y)] = null;
                 dictSharks[(gridPosition.x, gridPosition.y)] = shark;
 
+                shark.gridPos = gridPosition;
+
                 shark.MoveToPos(targetPos, () =>
                 {
                     actionDone?.Invoke();
                     Destroy(gameObject);
-                    gameControl.I.Lose();
                 });
             }
         }

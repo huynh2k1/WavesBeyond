@@ -38,9 +38,9 @@ public class PlayerInput : MonoBehaviour
        )
     {
         gridPos = grid.WorldToCell(transform.position);
-        dictGrid = new Dictionary<(int, int), Cell>(dict);
-        dictDNM = new Dictionary<(int, int), DynamicObj>(dictDynamic);
-        dictSharks = new Dictionary<(int, int), Shark>(dictShark);
+        dictGrid = dict;         // giữ reference
+        dictDNM = dictDynamic;   // giữ reference
+        dictSharks = dictShark;  // giữ reference – không copy!!
     }
 
 
@@ -52,6 +52,8 @@ public class PlayerInput : MonoBehaviour
 
     void TryMove(Vector2Int direction)
     {
+        if (gameControl.I.CurState != State.PLAYING)
+            return;
         if (dictGrid == null)
         {
             Debug.LogError("PlayerInput.TryMove: dictGrid is null!");
@@ -113,13 +115,17 @@ public class PlayerInput : MonoBehaviour
 
     void HandleSharkMove(Vector3 targetPos, Vector3Int gridPosition)
     {
-        // 4 hướng quanh player
         Vector2Int[] dirs = new Vector2Int[]
         {
-        new Vector2Int(1,0),   // phải
-        new Vector2Int(-1,0),  // trái
-        new Vector2Int(0,1),   // lên
-        new Vector2Int(0,-1),  // xuống
+            new Vector2Int( 1, 0),   // phải
+            new Vector2Int(-1, 0),   // trái
+            new Vector2Int( 0, 1),   // lên
+            new Vector2Int( 0,-1),   // xuống
+
+            new Vector2Int( 1, 1),   // chéo phải lên
+            new Vector2Int( 1,-1),   // chéo phải xuống
+            new Vector2Int(-1, 1),   // chéo trái lên
+            new Vector2Int(-1,-1),   // chéo trái xuống
         };
 
         foreach (var dir in dirs)
@@ -128,9 +134,10 @@ public class PlayerInput : MonoBehaviour
 
             if (dictSharks.TryGetValue(key, out Shark shark))
             {
-                dictSharks[(shark.gridPos.x, shark.gridPos.y)] = null;
+                dictSharks[key] = null;
                 dictSharks[(gridPosition.x, gridPosition.y)] = shark;
 
+                shark.gridPos = gridPosition;
                 shark.MoveToPos(targetPos, () =>
                 {
                     Destroy(gameObject);

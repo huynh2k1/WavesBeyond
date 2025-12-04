@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class gameControl : MonoBehaviour
@@ -72,13 +73,19 @@ public class gameControl : MonoBehaviour
         Debug.Log("Win");
         ChangeState(State.NONE);
         lvlCtrl.CheckIncreaseLevel();
-        uiCtrl.Show(UIType.WIN);
+        DOVirtual.DelayedCall(1f, () =>
+        {
+            uiCtrl.Show(UIType.WIN);
+        });
     }
 
     public void Lose()
     {
         ChangeState(State.NONE);
-        uiCtrl.Show(UIType.LOSE);
+        DOVirtual.DelayedCall(1f, () =>
+        {
+            uiCtrl.Show(UIType.LOSE);
+        });
     }
 
     public void InitMoveCount(int count)
