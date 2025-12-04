@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class Shark : MonoBehaviour
@@ -12,7 +13,11 @@ public class Shark : MonoBehaviour
 
     public void MoveToPos(Vector3 pos, System.Action actionDone = default)
     {
-        transform.position = pos;
-        actionDone?.Invoke();
+        transform.DOKill();
+        transform.DOMove(pos, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+        {
+            transform.position = pos;
+            actionDone?.Invoke();
+        });
     }
 }

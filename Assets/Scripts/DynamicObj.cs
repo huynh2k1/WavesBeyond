@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,8 +17,12 @@ public class DynamicObj : MonoBehaviour
 
     public void MoveToPos(Vector3 pos, Action actionDone = default)
     {
-        transform.position = pos;
-        actionDone?.Invoke();
+        transform.DOKill();
+        transform.DOMove(pos, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+        {
+            transform.position = pos;
+            actionDone?.Invoke();
+        });
     }
 
     public void TryMove(Dictionary<(int, int), Cell> dictGrid,
@@ -58,14 +63,11 @@ public class DynamicObj : MonoBehaviour
                 return;
             }
 
-            HandleSharkMove(transform.position, gridPos, () =>
-            {
-                dictDynamic[targetKey] = null;
-            });
+            HandleSharkMove(dictDynamic, transform.position, gridPos);
         });
     }
 
-    void HandleSharkMove(Vector3 targetPos, Vector3Int gridPosition, Action actionDone = default)
+    void HandleSharkMove(Dictionary<(int, int), DynamicObj> dictDynamic, Vector3 targetPos, Vector3Int gridPosition, Action actionDone = default)
     {
         Vector2Int[] dirs = new Vector2Int[]
         {
@@ -93,9 +95,15 @@ public class DynamicObj : MonoBehaviour
 
                 shark.MoveToPos(targetPos, () =>
                 {
+                    dictDynamic[(gridPos.x, gridPos.y)] = null;
+
                     actionDone?.Invoke();
                     Destroy(gameObject);
                 });
+            }
+            else
+            {
+                actionDone?.Invoke();
             }
         }
     }

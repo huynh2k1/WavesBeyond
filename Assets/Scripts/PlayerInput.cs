@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,9 +10,10 @@ public class PlayerInput : MonoBehaviour
     private Dictionary<(int, int), DynamicObj> dictDNM;
     private Dictionary<(int, int), Shark> dictSharks;
 
-
+    [SerializeField] ParticleSystem _confetti;
     //None -> được đi
     //Dynamic _> di chuyển ô đó
+
 
     private void Update()
     {
@@ -44,10 +46,14 @@ public class PlayerInput : MonoBehaviour
     }
 
 
-    public void MoveToPos(Vector3 pos, Action actionDone = default)
+    public void MoveToPos(Vector3 pos, Action actionDone)
     {
-        transform.position = pos;
-        actionDone?.Invoke();
+        transform.DOKill();
+        transform.DOMove(pos, 0.1f).SetEase(Ease.Linear).OnComplete(() =>
+        {
+            transform.position = pos;
+            actionDone?.Invoke();
+        });
     }
 
     void TryMove(Vector2Int direction)
@@ -65,6 +71,7 @@ public class PlayerInput : MonoBehaviour
             Debug.LogError("PlayerInput.TryMove: dictDNM is null! Did you call Initialize(...) ?");
             return;
         }
+
         (int, int) targetKey = (gridPos.x + direction.x, gridPos.y + direction.y);
 
         if (!dictGrid.TryGetValue(targetKey, out Cell cell) || cell == null)
@@ -73,7 +80,9 @@ public class PlayerInput : MonoBehaviour
         }
 
         if (cell.TypeCell == Cell.Type.STATIC)
+        {
             return;
+        }
 
 
         if (dictDNM.TryGetValue(targetKey, out DynamicObj dynamicObj) && dynamicObj != null)
@@ -87,17 +96,14 @@ public class PlayerInput : MonoBehaviour
 
         // EMPTY hoặc TARGET — player di chuyển vào
         Vector3 targetPos = cell.Position;
-        gridPos = new Vector3Int(cell.gridPos.x, cell.gridPos.y, 0);
 
         MoveToPos(targetPos, () =>
         {
-            if(cell.TypeCell == Cell.Type.STARSEA)
-            {
-                gameControl.I.UpdateMove();
-            }
+            gridPos = new Vector3Int(cell.gridPos.x, cell.gridPos.y, 0);
             // cập nhật vị trí grid
             if (cell.TypeCell == Cell.Type.TARGET)
             {
+                _confetti.Play();
                 gameControl.I.Victory();
                 return;
             }
@@ -106,6 +112,11 @@ public class PlayerInput : MonoBehaviour
             {
                 gameControl.I.Lose();
                 return;
+            }
+
+            if(cell.TypeCell == Cell.Type.STARSEA)
+            {
+                gameControl.I.UpdateMove();
             }
 
             HandleSharkMove(transform.position, gridPos);
@@ -142,6 +153,7 @@ public class PlayerInput : MonoBehaviour
                 {
                     Destroy(gameObject);
                     gameControl.I.Lose();
+                    return;
                 });
             }
         }
